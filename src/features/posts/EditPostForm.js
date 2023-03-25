@@ -1,34 +1,49 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { postUpdated } from './postsSlice';
+import { postUpdated, selectPostById } from './postsSlice';
 import styles from './AddPostForm.module.css';
 
 const EditPostForm = () => {
-  const { slug } = useParams();
+  const { postId } = useParams();
 
-  const post = useSelector(state => state.posts.find(post => post.id === slug));
+  const post = useSelector(state => selectPostById(state, Number(postId)));
 
   const [title, setTitle] = useState(post.title);
-  const [content, setContent] = useState(post.content);
+  const [body, setBody] = useState(post.body);
+  const [userId, setUserId] = useState('');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const users = useSelector(state => state.users);
 
   function onTitleChange(ev) {
     setTitle(ev.target.value);
   }
 
-  function onContentChange(ev) {
-    setContent(ev.target.value);
+  function onBodyChange(ev) {
+    setBody(ev.target.value);
+  }
+
+  function onAuthorChange(ev) {
+    setUserId(ev.target.value);
   }
 
   function onSavePostClicked() {
-    if (title && content) {
-      dispatch(postUpdated({ id: post.id, title, content }));
+    if (title && body) {
+      dispatch(postUpdated({ id: post.id, title, body, userId }));
       navigate(`/posts/${post.id}`);
     }
   }
+
+  const canSave = Boolean(title) && Boolean(body) && Boolean(userId);
+
+  const userOptions = users.map(user => (
+    <option key={user.id} value={user.id}>
+      {user.name}
+    </option>
+  ));
 
   return (
     <section className='content'>
@@ -45,15 +60,32 @@ const EditPostForm = () => {
           />
         </div>
         <div className={styles.line}>
+          <label htmlFor='postAuthor' className={styles.label}>Author</label>
+          <select
+            id='postAuthor'
+            defaultValue={post.userId}
+            onChange={(ev) => onAuthorChange(ev)}
+          >
+            <option value=""></option>
+            {userOptions}
+          </select>
+        </div>
+        <div className={styles.line}>
           <label htmlFor='postContent' className={styles.label}>Post content:</label>
           <textarea
             id="postContent"
             name="postContent"
-            value={content}
-            onChange={(ev) => onContentChange(ev)}
+            value={body}
+            onChange={(ev) => onBodyChange(ev)}
           />
         </div>
-        <button type='button' onClick={onSavePostClicked}>Save</button>
+        <button
+          type='button'
+          onClick={onSavePostClicked}
+          disabled={!canSave}
+        >
+          Save
+        </button>
       </form>
     </section>
   )

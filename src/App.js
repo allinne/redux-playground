@@ -6,6 +6,8 @@ import SinglePostPage from './features/posts/SinglePostPage';
 import Navbar from './app/Navbar';
 import EditPostForm from './features/posts/EditPostForm';
 import AddPostForm from './features/posts/AddPostForm';
+import UserList from './features/users/UsersList';
+import UserPage from './features/users/UserPage';
 
 function App() {
   return (
@@ -14,8 +16,10 @@ function App() {
       <Routes>
         <Route path="/" element={<PostsList />} />
         <Route path="/posts/new" element={<AddPostForm />} />
-        <Route path="/posts/:slug" element={<SinglePostPage />} />
-        <Route path="/editPost/:slug" element={<EditPostForm />} />
+        <Route path="/posts/:postId" element={<SinglePostPage />} />
+        <Route path="/editPost/:postId" element={<EditPostForm />} />
+        <Route path="/users" element={<UserList />} />
+        <Route path="/users/:userId" element={<UserPage />} />
       </Routes>
     </>
   );
